@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FindBack AI - Campus Lost & Found Platform</title>
+  
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Header / Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand" onclick="switchTab('home')">
+        <div class="brand-icon">
+          <i class="fa-solid fa-compass-drafting"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">FindBack <span class="brand-ai">AI</span></span>
+          <span class="brand-subtitle">Campus Lost & Found</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu" id="nav-menu">
+        <button class="nav-link active" data-tab="home" onclick="switchTab('home')">
+          <i class="fa-solid fa-house"></i> Home
+        </button>
+        <button class="nav-link" data-tab="browse" onclick="switchTab('browse')">
+          <i class="fa-solid fa-list-check"></i> Browse Items
+        </button>
+        <button class="nav-link" data-tab="matches" onclick="switchTab('matches')">
+          <i class="fa-solid fa-brain"></i> AI Matches
+        </button>
+        <button class="nav-link" data-tab="report-lost" onclick="switchTab('report-lost')">
+          <i class="fa-solid fa-circle-exclamation"></i> Report Lost
+        </button>
+        <button class="nav-link" data-tab="report-found" onclick="switchTab('report-found')">
+          <i class="fa-solid fa-hand-holding-hand"></i> Report Found
+        </button>
+        <button class="nav-link auth-required" data-tab="claims" onclick="switchTab('claims')" style="display: none;">
+          <i class="fa-solid fa-shield-halved"></i> My Claims
+        </button>
+        <button class="nav-link admin-only" data-tab="admin" onclick="switchTab('admin')" style="display: none;">
+          <i class="fa-solid fa-user-gear"></i> Admin Panel
+        </button>
+      </nav>
+
+      <div class="nav-auth" id="nav-auth">
+        <button class="btn btn-outline" id="btn-login-modal" onclick="openModal('auth-modal')">
+          <i class="fa-solid fa-right-to-bracket"></i> Login / Register
+        </button>
+        <div class="user-profile-badge" id="user-profile-badge" style="display: none;">
+          <div class="avatar" id="user-avatar">U</div>
+          <span class="user-name" id="user-name-display">User</span>
+          <button class="btn-icon" onclick="handleLogout()" title="Logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area (Tabbed Views) -->
+  <main class="main-content">
+
+    <!-- TAB 1: HOME / LANDING PAGE -->
+    <section id="tab-home" class="tab-view active">
+      <!-- Hero Banner -->
+      <div class="hero">
+        <div class="hero-content">
+          <div class="badge-pill">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> AI-Powered Campus Lost & Found
+          </div>
+          <h1 class="hero-title">Lost Something on Campus? <br><span class="gradient-text">FindBack AI Matches It In Seconds.</span></h1>
+          <p class="hero-description">
+            Centralized loss reporting for college campuses. Our intelligent AI engine compares description embeddings, visual color signals, and campus location metadata to connect owners with finders securely.
+          </p>
+          <div class="hero-actions">
+            <button class="btn btn-danger btn-lg" onclick="switchTab('report-lost')">
+              <i class="fa-solid fa-circle-exclamation"></i> Report Lost Item
+            </button>
+            <button class="btn btn-success btn-lg" onclick="switchTab('report-found')">
+              <i class="fa-solid fa-circle-check"></i> Report Found Item
+            </button>
+            <button class="btn btn-secondary btn-lg" onclick="switchTab('browse')">
+              <i class="fa-solid fa-magnifying-glass"></i> Search Items
+            </button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="floating-card c1">
+            <div class="f-icon"><i class="fa-solid fa-laptop text-primary"></i></div>
+            <div class="f-info">
+              <strong>Dell XPS Laptop</strong>
+              <small>Library 2nd Floor</small>
+            </div>
+            <span class="match-badge high">91% Match</span>
+          </div>
+          <div class="floating-card c2">
+            <div class="f-icon"><i class="fa-solid fa-wallet text-secondary"></i></div>
+            <div class="f-info">
+              <strong>Blue Leather Wallet</strong>
+              <small>Cafeteria Grounds</small>
+            </div>
+            <span class="match-badge medium">84% Match</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon icon-blue"><i class="fa-solid fa-box-open"></i></div>
+          <div class="stat-details">
+            <h3 id="stat-total">--</h3>
+            <p>Total Items Reported</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-red"><i class="fa-solid fa-circle-question"></i></div>
+          <div class="stat-details">
+            <h3 id="stat-lost">--</h3>
+            <p>Active Lost Reports</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-green"><i class="fa-solid fa-circle-check"></i></div>
+          <div class="stat-details">
+            <h3 id="stat-found">--</h3>
+            <p>Items Found & Listed</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon icon-purple"><i class="fa-solid fa-handshake"></i></div>
+          <div class="stat-details">
+            <h3 id="stat-resolved">--</h3>
+            <p>Successful Recoveries</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- How It Works Section -->
+      <div class="section-container">
+        <div class="section-header center">
+          <h2>How FindBack AI Works</h2>
+          <p>Structured reporting, AI similarity ranking, and verification-based recovery.</p>
+        </div>
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-number">01</div>
+            <div class="step-icon"><i class="fa-solid fa-file-pen"></i></div>
+            <h3>1. Report Item</h3>
+            <p>Submit structured details including category, colour, photo, date/time, and campus location.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-number">02</div>
+            <div class="step-icon"><i class="fa-solid fa-robot"></i></div>
+            <h3>2. AI Scoring Engine</h3>
+            <p>Python AI analyzes text embeddings, color histograms, and location proximity signals.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-number">03</div>
+            <div class="step-icon"><i class="fa-solid fa-shield-cat"></i></div>
+            <h3>3. Verification & Claim</h3>
+            <p>View potential matches and submit proof of ownership (serial numbers, internal marks) to claim.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: BROWSE & SEARCH ITEMS -->
+    <section id="tab-browse" class="tab-view">
+      <div class="section-container">
+        <div class="section-header">
+          <div>
+            <h2>Search & Discover Items</h2>
+            <p>Explore recent lost and found reports across campus.</p>
+          </div>
+          <button class="btn btn-primary" onclick="loadItems()">
+            <i class="fa-solid fa-rotate"></i> Refresh List
+          </button>
+        </div>
+
+        <!-- Filter Controls Bar -->
+        <div class="filter-card">
+          <div class="filter-row">
+            <div class="search-input-group">
+              <i class="fa-solid fa-magnifying-glass search-icon"></i>
+              <input type="text" id="filter-search" placeholder="Search keywords (e.g. Laptop, Blue Wallet, Library)..." onkeyup="applyFilters()">
+            </div>
+            
+            <select id="filter-type" onchange="applyFilters()">
+              <option value="">All Report Types (Lost & Found)</option>
+              <option value="lost">Lost Items Only</option>
+              <option value="found">Found Items Only</option>
+            </select>
+
+            <select id="filter-category" onchange="applyFilters()">
+              <option value="">All Categories</option>
+              <option value="Electronics">Electronics (Laptops, Phones, Airpods)</option>
+              <option value="Personal Belongings">Personal Belongings (Wallets, Keys, Bags)</option>
+              <option value="Documents">Documents & ID Cards</option>
+              <option value="Clothing">Clothing & Footwear</option>
+              <option value="Accessories">Accessories & Jewelry</option>
+              <option value="Books">Books & Stationery</option>
+              <option value="Other">Other Items</option>
+            </select>
+
+            <select id="filter-status" onchange="applyFilters()">
+              <option value="">All Statuses</option>
+              <option value="active">Active Reports</option>
+              <option value="claimed">Under Verification</option>
+              <option value="resolved">Resolved & Returned</option>
+            </select>
+          </div>
+
+          <div class="filter-row secondary">
+            <input type="text" id="filter-colour" placeholder="Filter by Colour (e.g., Black, Blue)" onkeyup="applyFilters()">
+            <input type="text" id="filter-location" placeholder="Filter by Location (e.g., Library, Cafeteria)" onkeyup="applyFilters()">
+            <button class="btn btn-light" onclick="resetFilters()">
+              <i class="fa-solid fa-filter-circle-xmark"></i> Clear Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Items Grid Container -->
+        <div id="items-grid" class="items-grid">
+          <!-- Dynamically populated via JS -->
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Fetching campus reports...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: AI MATCHES VIEW -->
+    <section id="tab-matches" class="tab-view">
+      <div class="section-container">
+        <div class="section-header">
+          <div>
+            <h2><i class="fa-solid fa-brain text-purple"></i> AI Potential Match Engine</h2>
+            <p>Compare items against campus reports and rank semantic, visual, and metadata matches.</p>
+          </div>
+        </div>
+
+        <div class="match-selector-card">
+          <label for="select-match-item">Select your reported item to find potential matches:</label>
+          <div class="input-action-row">
+            <select id="select-match-item">
+              <option value="">-- Choose one of your reported items --</option>
+            </select>
+            <button class="btn btn-purple" onclick="runAIMatching()">
+              <i class="fa-solid fa-bolt"></i> Run AI Match Analysis
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Results Display -->
+        <div id="ai-matches-results" class="ai-results-container">
+          <div class="empty-state">
+            <div class="empty-icon"><i class="fa-solid fa-microchip"></i></div>
+            <h3>No AI Match Run Yet</h3>
+            <p>Select a reported lost or found item above and click "Run AI Match Analysis" to query candidate matches.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: REPORT LOST ITEM -->
+    <section id="tab-report-lost" class="tab-view">
+      <div class="section-container form-container">
+        <div class="form-header header-lost">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          <div>
+            <h2>Report a Lost Item</h2>
+            <p>Provide detailed information to help campus AI match your lost item.</p>
+          </div>
+        </div>
+
+        <form id="form-report-lost" class="styled-form" onsubmit="handleReportSubmit(event, 'lost')">
+          <div class="form-grid">
+            <div class="form-group span-2">
+              <label for="lost-title">Item Name / Title <span class="required">*</span></label>
+              <input type="text" id="lost-title" required placeholder="e.g., Black Dell XPS 15 Laptop with stickers">
+            </div>
+
+            <div class="form-group">
+              <label for="lost-category">Category <span class="required">*</span></label>
+              <select id="lost-category" required>
+                <option value="">Select Category</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Personal Belongings">Personal Belongings</option>
+                <option value="Documents">Documents & ID Cards</option>
+                <option value="Clothing">Clothing & Footwear</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Books">Books & Stationery</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="lost-colour">Primary Colour</label>
+              <input type="text" id="lost-colour" placeholder="e.g., Black, Navy Blue, Silver">
+            </div>
+
+            <div class="form-group">
+              <label for="lost-location">Last Seen Location <span class="required">*</span></label>
+              <input type="text" id="lost-location" required placeholder="e.g., Central Library 2nd Floor, Table 14">
+            </div>
+
+            <div class="form-group">
+              <label for="lost-date">Approximate Date & Time <span class="required">*</span></label>
+              <input type="datetime-local" id="lost-date" required>
+            </div>
+
+            <div class="form-group span-2">
+              <label for="lost-description">Detailed Description <span class="required">*</span></label>
+              <textarea id="lost-description" rows="4" required placeholder="Describe distinguishing features, contents, scratches, unique logos, stickers, or wallpaper..."></textarea>
+            </div>
+
+            <div class="form-group span-2">
+              <label for="lost-contact">Contact Info (Optional/Public)</label>
+              <input type="text" id="lost-contact" placeholder="Email or phone number for finder verification">
+            </div>
+
+            <div class="form-group span-2">
+              <label>Item Image (Optional but recommended for AI visual matching)</label>
+              <div class="file-upload-zone" onclick="document.getElementById('lost-image').click()">
+                <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                <p>Click or drag photo here to upload image</p>
+                <small>PNG, JPG, WEBP up to 5MB</small>
+                <input type="file" id="lost-image" accept="image/*" style="display: none;" onchange="previewImage(this, 'lost-preview')">
+              </div>
+              <div id="lost-preview" class="image-preview-box"></div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-danger btn-lg">
+              <i class="fa-solid fa-paper-plane"></i> Submit Lost Report
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 5: REPORT FOUND ITEM -->
+    <section id="tab-report-found" class="tab-view">
+      <div class="section-container form-container">
+        <div class="form-header header-found">
+          <i class="fa-solid fa-hand-holding-hand"></i>
+          <div>
+            <h2>Report a Found Item</h2>
+            <p>Help return a lost item to its rightful owner on campus.</p>
+          </div>
+        </div>
+
+        <form id="form-report-found" class="styled-form" onsubmit="handleReportSubmit(event, 'found')">
+          <div class="form-grid">
+            <div class="form-group span-2">
+              <label for="found-title">Item Name / Title <span class="required">*</span></label>
+              <input type="text" id="found-title" required placeholder="e.g., Found Dell Laptop with sleeve">
+            </div>
+
+            <div class="form-group">
+              <label for="found-category">Category <span class="required">*</span></label>
+              <select id="found-category" required>
+                <option value="">Select Category</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Personal Belongings">Personal Belongings</option>
+                <option value="Documents">Documents & ID Cards</option>
+                <option value="Clothing">Clothing & Footwear</option>
+                <option value="Accessories">Accessories</option>
+                <option value="Books">Books & Stationery</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="found-colour">Primary Colour</label>
+              <input type="text" id="found-colour" placeholder="e.g., Black, Blue">
+            </div>
+
+            <div class="form-group">
+              <label for="found-location">Found Location <span class="required">*</span></label>
+              <input type="text" id="found-location" required placeholder="e.g., Central Library main reading table">
+            </div>
+
+            <div class="form-group">
+              <label for="found-date">Date & Time Found <span class="required">*</span></label>
+              <input type="datetime-local" id="found-date" required>
+            </div>
+
+            <div class="form-group span-2">
+              <label for="found-description">General Description <span class="required">*</span></label>
+              <textarea id="found-description" rows="4" required placeholder="Provide general description without revealing secret internal items so owners can verify ownership..."></textarea>
+            </div>
+
+            <div class="form-group span-2">
+              <label for="found-contact">Contact Info / Current Storage Location</label>
+              <input type="text" id="found-contact" placeholder="e.g. Deposited at Library Security Desk / Email">
+            </div>
+
+            <div class="form-group span-2">
+              <label>Photo of Found Item</label>
+              <div class="file-upload-zone" onclick="document.getElementById('found-image').click()">
+                <i class="fa-solid fa-camera upload-icon"></i>
+                <p>Click or drag photo here to upload image</p>
+                <small>PNG, JPG, WEBP up to 5MB</small>
+                <input type="file" id="found-image" accept="image/*" style="display: none;" onchange="previewImage(this, 'found-preview')">
+              </div>
+              <div id="found-preview" class="image-preview-box"></div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-success btn-lg">
+              <i class="fa-solid fa-paper-plane"></i> Submit Found Report
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- TAB 6: MY CLAIMS / VERIFICATION -->
+    <section id="tab-claims" class="tab-view">
+      <div class="section-container">
+        <div class="section-header">
+          <div>
+            <h2><i class="fa-solid fa-shield-halved text-primary"></i> Verification & Claims Workflow</h2>
+            <p>Track ownership claims and review verification proofs submitted for items.</p>
+          </div>
+        </div>
+
+        <div id="claims-list-container">
+          <!-- Dynamically populated via JS -->
+          <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading claims data...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 7: ADMIN DASHBOARD -->
+    <section id="tab-admin" class="tab-view">
+      <div class="section-container">
+        <div class="section-header">
+          <div>
+            <h2><i class="fa-solid fa-user-gear text-danger"></i> Admin Control Panel</h2>
+            <p>Platform management, suspicious report reviews, claim approvals, and user accounts.</p>
+          </div>
+        </div>
+
+        <!-- Admin Quick Metrics -->
+        <div class="admin-metrics-grid">
+          <div class="a-metric">
+            <h4 id="adm-users">0</h4>
+            <span>Total Registered Users</span>
+          </div>
+          <div class="a-metric">
+            <h4 id="adm-items">0</h4>
+            <span>Total Reported Items</span>
+          </div>
+          <div class="a-metric">
+            <h4 id="adm-pending-claims">0</h4>
+            <span>Pending Claims</span>
+          </div>
+          <div class="a-metric">
+            <h4 id="adm-resolved">0</h4>
+            <span>Resolved Items</span>
+          </div>
+        </div>
+
+        <!-- Admin Tabs / Tables -->
+        <div class="admin-subtabs">
+          <button class="btn btn-light active" onclick="switchAdminSubtab('reports')">Item Reports</button>
+          <button class="btn btn-light" onclick="switchAdminSubtab('claims')">Claims & Verifications</button>
+          <button class="btn btn-light" onclick="switchAdminSubtab('users')">User Management</button>
+        </div>
+
+        <div id="admin-subcontent">
+          <!-- Dynamically loaded admin tables -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODALS CONTAINER -->
+
+  <!-- 1. AUTH MODAL (LOGIN / REGISTER) -->
+  <div id="auth-modal" class="modal">
+    <div class="modal-content auth-modal-content">
+      <button class="modal-close" onclick="closeModal('auth-modal')">&times;</button>
+      
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="btn-show-login" onclick="toggleAuthMode('login')">Login</button>
+        <button class="auth-tab-btn" id="btn-show-register" onclick="toggleAuthMode('register')">Register</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="form-login" class="auth-form" onsubmit="handleLogin(event)">
+        <h3>Welcome Back</h3>
+        <p class="auth-sub">Enter your credentials to access your account.</p>
+        
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="login-email" required placeholder="student@campus.edu">
+        </div>
+        
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="login-password" required placeholder="••••••••">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">
+          <i class="fa-solid fa-right-to-bracket"></i> Log In
+        </button>
+
+        <div class="demo-login-box">
+          <small>⚡ Demo Quick Login:</small>
+          <div class="demo-btns">
+            <button type="button" class="btn-sm btn-light" onclick="quickLogin('rahul@student.edu', 'password123')">Student (Rahul)</button>
+            <button type="button" class="btn-sm btn-dark" onclick="quickLogin('admin@campus.edu', 'password123')">Admin</button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Register Form -->
+      <form id="form-register" class="auth-form" onsubmit="handleRegister(event)" style="display: none;">
+        <h3>Create Campus Account</h3>
+        <p class="auth-sub">Join FindBack AI to report or claim lost items.</p>
+        
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="reg-name" required placeholder="e.g. Ananya Sharma">
+        </div>
+
+        <div class="form-group">
+          <label>Campus Email</label>
+          <input type="email" id="reg-email" required placeholder="ananya@student.edu">
+        </div>
+        
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="reg-password" required minlength="6" placeholder="At least 6 characters">
+        </div>
+
+        <div class="form-group">
+          <label>Account Role</label>
+          <select id="reg-role">
+            <option value="user">Student / Faculty (User)</option>
+            <option value="admin">Campus Admin</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-success btn-block">
+          <i class="fa-solid fa-user-plus"></i> Register Account
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. ITEM DETAILS MODAL -->
+  <div id="item-details-modal" class="modal">
+    <div class="modal-content item-modal-content">
+      <button class="modal-close" onclick="closeModal('item-details-modal')">&times;</button>
+      <div id="item-details-body">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. CLAIM / VERIFICATION MODAL -->
+  <div id="claim-modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('claim-modal')">&times;</button>
+      <div class="modal-header">
+        <i class="fa-solid fa-shield-cat text-primary modal-header-icon"></i>
+        <div>
+          <h3>Submit Ownership Verification</h3>
+          <p>Provide specific details to prove ownership of this item.</p>
+        </div>
+      </div>
+
+      <form id="form-submit-claim" onsubmit="handleClaimSubmit(event)">
+        <input type="hidden" id="claim-item-id">
+        <input type="hidden" id="claim-match-id">
+
+        <div class="form-group">
+          <label for="claim-details">Proof of Ownership / Verification Details <span class="required">*</span></label>
+          <textarea id="claim-details" rows="5" required placeholder="Specify unique marks, lock screens, serial numbers, exact internal items, receipt details, or wallpaper images that prove this item is yours..."></textarea>
+          <small class="text-muted">This information will be reviewed by the finder or campus administration.</small>
+        </div>
+
+        <div class="alert alert-warning" style="margin-top: 15px;">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>False claims violate campus policy. Ownership must be verified before return.</span>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" onclick="closeModal('claim-modal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-paper-plane"></i> Submit Verification Claim
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <i class="fa-solid fa-compass-drafting"></i> FindBack AI
+        <p>AI-Powered Campus Lost & Found Platform. Team FourMinds.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#" onclick="switchTab('home')">Home</a>
+        <a href="#" onclick="switchTab('browse')">Browse</a>
+        <a href="#" onclick="switchTab('matches')">AI Matches</a>
+        <a href="#" onclick="switchTab('report-lost')">Report Lost</a>
+        <a href="#" onclick="switchTab('report-found')">Report Found</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Custom JavaScript -->
+  <script src="script.js"></script>
+</body>
+</html>
